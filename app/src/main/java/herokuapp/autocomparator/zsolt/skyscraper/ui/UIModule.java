@@ -1,4 +1,4 @@
-package hu.bme.aut.android.spotifydemo.ui;
+package herokuapp.autocomparator.zsolt.skyscraper.ui;
 
 import android.content.Context;
 
@@ -9,9 +9,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import hu.bme.aut.android.spotifydemo.di.Network;
-import hu.bme.aut.android.spotifydemo.ui.artists.ArtistsPresenter;
-import hu.bme.aut.android.spotifydemo.ui.main.MainPresenter;
+import herokuapp.autocomparator.zsolt.skyscraper.ui.main.MainPresenter;
 
 @Module
 public class UIModule {
@@ -30,18 +28,5 @@ public class UIModule {
     @Singleton
     public MainPresenter provideMainPresenter() {
         return new MainPresenter();
-    }
-
-    @Provides
-    @Singleton
-    public ArtistsPresenter provideArtistsPresenter() {
-        return new ArtistsPresenter();
-    }
-
-    @Provides
-    @Singleton
-    @Network
-    public Executor provideNetworkExecutor() {
-        return Executors.newFixedThreadPool(1);
     }
 }

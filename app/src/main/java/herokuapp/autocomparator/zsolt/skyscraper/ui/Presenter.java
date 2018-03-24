@@ -1,4 +1,4 @@
-package hu.bme.aut.android.spotifydemo.ui;
+package herokuapp.autocomparator.zsolt.skyscraper.ui;
 
 public abstract class Presenter<S> {
     protected S screen;

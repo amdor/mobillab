@@ -1,6 +1,6 @@
-package hu.bme.aut.android.spotifydemo.ui.main;
+package herokuapp.autocomparator.zsolt.skyscraper.ui.main;
 
-import hu.bme.aut.android.spotifydemo.ui.Presenter;
+import herokuapp.autocomparator.zsolt.skyscraper.ui.Presenter;
 
 public class MainPresenter extends Presenter<MainScreen> {
 
@@ -14,8 +14,8 @@ public class MainPresenter extends Presenter<MainScreen> {
         super.detachScreen();
     }
 
-    public void showArtistsSearchList(
-            String artistSearchTerm) {
-        screen.showArtists(artistSearchTerm);
+    public void loginWithUserName(
+            String userName) {
+        screen.login(userName);
     }
 }

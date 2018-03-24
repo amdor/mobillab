@@ -1,5 +1,5 @@
-package hu.bme.aut.android.spotifydemo.ui.main;
+package herokuapp.autocomparator.zsolt.skyscraper.ui.main;
 
 public interface MainScreen {
-    void showArtists(String artistSearchTerm);
+    void login(String userName);
 }

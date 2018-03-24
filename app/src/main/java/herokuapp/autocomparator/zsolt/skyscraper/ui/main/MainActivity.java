@@ -1,23 +1,14 @@
-package hu.bme.aut.android.spotifydemo.ui.main;
+package herokuapp.autocomparator.zsolt.skyscraper.ui.main;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import javax.inject.Inject;
 
-import hu.bme.aut.android.spotifydemo.R;
-import hu.bme.aut.android.spotifydemo.SpotifyDemoApplication;
-import hu.bme.aut.android.spotifydemo.ui.artists.ArtistsActivity;
+import herokuapp.autocomparator.zsolt.skyscraper.R;
+import herokuapp.autocomparator.zsolt.skyscraper.SkyscraperApplication;
 
 public class MainActivity extends AppCompatActivity implements MainScreen {
-
-    public static final String KEY_ARTIST = "KEY_ARTIST";
-
-    private EditText etArtist;
 
     @Inject
     MainPresenter mainPresenter;
@@ -26,19 +17,9 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        SpotifyDemoApplication.injector.inject(this);
-
-        etArtist = (EditText) findViewById(R.id.etArtist);
-
-        Button btnShowSongs = (Button) findViewById(R.id.btnShowArtists);
-        btnShowSongs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainPresenter.showArtistsSearchList(etArtist.getText().toString());
-            }
-        });
+        SkyscraperApplication.injector.inject(this);
     }
+
 
     @Override
     protected void onStart() {
@@ -53,9 +34,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     @Override
-    public void showArtists(String artistSearchTerm) {
-        Intent intent = new Intent(MainActivity.this, ArtistsActivity.class);
-        intent.putExtra(KEY_ARTIST,artistSearchTerm);
-        startActivity(intent);
+    public void login(String userName) {
+        //TODO
     }
 }

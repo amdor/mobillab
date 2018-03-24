@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">skyscraper</string>
+    <string name="app_name">Skyscraper</string>
+    <string name="title_car_list">Cars</string>
+    <string name="title_car_detail">Car Detail</string>
 </resources>
