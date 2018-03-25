@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.CarListDetailPresenter;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.main.MainPresenter;
 
 @Module
@@ -28,5 +29,11 @@ public class UIModule {
     @Singleton
     public MainPresenter provideMainPresenter() {
         return new MainPresenter();
+    }
+
+    @Provides
+    @Singleton
+    public CarListDetailPresenter provideCarListDetailPresenter() {
+        return new CarListDetailPresenter();
     }
 }
