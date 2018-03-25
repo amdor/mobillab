@@ -18,6 +18,6 @@ before_install:
 script: ./gradlew :app:build 
 deploy:
   on:
-    condition: false
+    branch: release
 notifications:
   email: false
