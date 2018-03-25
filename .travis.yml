@@ -17,11 +17,7 @@ before_install:
  - yes | sdkmanager "platforms;android-26"
 script: ./gradlew :app:build 
 deploy:
- provider: releases
- apikey: $GITHUB_KEY
- file: app/build/outputs/apk/app-release.apk
- skip_cleanup: true
- on:
- tags: true
+  on:
+    condition: false
 notifications:
   email: false
