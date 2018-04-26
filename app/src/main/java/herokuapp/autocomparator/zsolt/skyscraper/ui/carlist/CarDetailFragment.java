@@ -10,10 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import herokuapp.autocomparator.zsolt.skyscraper.R;
 import herokuapp.autocomparator.zsolt.skyscraper.SkyscraperApplication;
+import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
 /**

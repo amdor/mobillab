@@ -1,5 +1,6 @@
 package herokuapp.autocomparator.zsolt.skyscraper.ui.carlist;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +15,16 @@ import android.widget.TextView;
 
 import herokuapp.autocomparator.zsolt.skyscraper.R;
 
+import herokuapp.autocomparator.zsolt.skyscraper.data.AppDatabase;
+import herokuapp.autocomparator.zsolt.skyscraper.interactor.CarListInteractor;
+import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetails;
+import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
+import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * An activity representing a list of Cars. This activity
@@ -29,6 +35,14 @@ import java.util.List;
  * item details side-by-side using two vertical panes.
  */
 public class CarListActivity extends AppCompatActivity {
+
+
+    @Inject
+    private CarListInteractor carListInteractor;
+
+    // TODO: connect with UI, replace dummy
+    final AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+            AppDatabase.class, "database-car-data").build();
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -44,15 +58,6 @@ public class CarListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         if (findViewById(R.id.car_detail_container) != null) {
             // The detail container view will be present only in the
@@ -138,5 +143,12 @@ public class CarListActivity extends AppCompatActivity {
                 mContentView = (TextView) view.findViewById(R.id.content);
             }
         }
+    }
+
+    // TODO: use on UI
+    public CarDetails queryCarData(String url) {
+        CarQueryObject carQueryObject = new CarQueryObject();
+        carQueryObject.setCarUrls(Arrays.asList(url));
+        return carListInteractor.postCars(carQueryObject);
     }
 }
