@@ -15,17 +15,16 @@ package herokuapp.autocomparator.zsolt.skyscraper.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import java.math.BigDecimal;
 import io.swagger.annotations.*;
 import com.google.gson.annotations.SerializedName;
 
 @ApiModel(description = "")
-@Entity
 public class CarDetail {
   
   @SerializedName("CarUri")
-  @PrimaryKey
   private String carUri = null;
 
   @SerializedName("prod_date")
@@ -46,7 +45,7 @@ public class CarDetail {
 
   @SerializedName("worth")
   @ColumnInfo(name = "worth")
-  private BigDecimal worth = null;
+  private Integer worth = null;
 
   /**
    **/
@@ -101,10 +100,10 @@ public class CarDetail {
   /**
    **/
   @ApiModelProperty(required = true, value = "")
-  public BigDecimal getWorth() {
+  public Integer getWorth() {
     return worth;
   }
-  public void setWorth(BigDecimal worth) {
+  public void setWorth(Integer worth) {
     this.worth = worth;
   }
 

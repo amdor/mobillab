@@ -14,8 +14,8 @@ public class MainPresenter extends Presenter<MainScreen> {
         super.detachScreen();
     }
 
-    public void loginWithUserName(
-            String userName) {
+    public void loginWithUserName(String userName) {
+
         screen.login(userName);
     }
 }

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +22,11 @@ import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetails;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -38,11 +42,10 @@ public class CarListActivity extends AppCompatActivity {
 
 
     @Inject
-    private CarListInteractor carListInteractor;
+    CarListInteractor carListInteractor;
 
     // TODO: connect with UI, replace dummy
-    final AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-            AppDatabase.class, "database-car-data").build();
+    private AppDatabase db;
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -54,6 +57,12 @@ public class CarListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_list);
+
+        this.db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-car-data").build();
+
+        Bundle bundle = getIntent().getExtras();
+        String userName = bundle.getString("userName");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -121,8 +130,9 @@ public class CarListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.wothField.setText(mValues.get(position).id);
+            holder.carName.setText(mValues.get(position).content);
+            holder.dateAdded.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
             holder.itemView.setTag(mValues.get(position));
             holder.itemView.setOnClickListener(mOnClickListener);
@@ -134,13 +144,15 @@ public class CarListActivity extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-            final TextView mContentView;
+            final TextView wothField;
+            final TextView dateAdded;
+            final TextView carName;
 
             ViewHolder(View view) {
                 super(view);
-                mIdView = (TextView) view.findViewById(R.id.id_text);
-                mContentView = (TextView) view.findViewById(R.id.content);
+                wothField = (TextView) view.findViewById(R.id.wothField);
+                dateAdded = (TextView) view.findViewById(R.id.dateAdded);
+                carName = (TextView) view.findViewById(R.id.carName);
             }
         }
     }

@@ -7,16 +7,16 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
-import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetail;
+import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetailsEntity;
 
 @Dao
 public interface CarDataDao {
     @Query("SELECT * FROM car_data")
-    public List<CarDetail> getAllGrades();
+    public List<CarDetailsEntity> getAllCarData();
 
     @Insert
-    void insertAll(CarDetail... carDetails);
+    void insertAll(CarDetailsEntity... carDetails);
 
     @Delete
-    void delete(CarDetail carDetail);
+    void delete(CarDetailsEntity carDetail);
 }
