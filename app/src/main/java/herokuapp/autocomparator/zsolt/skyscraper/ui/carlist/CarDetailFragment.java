@@ -17,6 +17,7 @@ import javax.inject.Inject;
 
 import herokuapp.autocomparator.zsolt.skyscraper.R;
 import herokuapp.autocomparator.zsolt.skyscraper.SkyscraperApplication;
+import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetail;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
@@ -36,7 +37,7 @@ public class CarDetailFragment extends Fragment implements CarListDetailsScreen 
     /**
      * The dummy content this fragment is presenting.
      */
-    private DummyContent.DummyItem mItem;
+    private CarDetail mItem;
 
     @Inject
     CarListDetailPresenter carListDetailPresenter;
@@ -70,7 +71,8 @@ public class CarDetailFragment extends Fragment implements CarListDetailsScreen 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.content);
+                String[] carName = mItem.getCarUri().split("/");
+                appBarLayout.setTitle(carName[4] + carName[5]);
             }
         }
     }
@@ -82,7 +84,7 @@ public class CarDetailFragment extends Fragment implements CarListDetailsScreen 
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.car_detail)).setText(mItem.details);
+            ((TextView) rootView.findViewById(R.id.car_detail)).setText(mItem.getPrice());
         }
 
         return rootView;

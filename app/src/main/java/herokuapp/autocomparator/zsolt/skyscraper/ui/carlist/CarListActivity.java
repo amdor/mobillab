@@ -12,17 +12,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import herokuapp.autocomparator.zsolt.skyscraper.R;
 
 import herokuapp.autocomparator.zsolt.skyscraper.data.AppDatabase;
 import herokuapp.autocomparator.zsolt.skyscraper.interactor.CarListInteractor;
+import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetail;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetails;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -53,6 +57,9 @@ public class CarListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
 
+    private EditText newCarUrl;
+    private Button addUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +67,11 @@ public class CarListActivity extends AppCompatActivity {
 
         this.db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "database-car-data").build();
+        this.carListInteractor = new CarListInteractor();
 
         Bundle bundle = getIntent().getExtras();
         String userName = bundle.getString("userName");
+        //TODO: load data from db
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -78,10 +87,28 @@ public class CarListActivity extends AppCompatActivity {
 
         View recyclerView = findViewById(R.id.car_list);
         assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        setupRecyclerView((RecyclerView) recyclerView, null);
+
+        newCarUrl = (EditText) findViewById(R.id.carUrl);
+        addUrl = (Button) findViewById(R.id.addButton);
+        addUrl.setOnClickListener(
+                new View.OnClickListener() {
+                    public void onClick(View view) {
+                        CarQueryObject queryObject = new CarQueryObject();
+                        List<String> urls = new ArrayList<String>();
+                        urls.add(newCarUrl.getText().toString());
+                        queryObject.setCarUrls(urls);
+                        CarDetails carDetails = carListInteractor.postCars(queryObject);
+                        //the must be only one since we sent one link
+                        DummyContent.addItem(carDetails.get(0));
+                        View recyclerView = findViewById(R.id.car_list);
+                        assert recyclerView != null;
+                        setupRecyclerView((RecyclerView) recyclerView, carDetails);
+                    }
+                });
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, CarDetails carDetails) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
     }
 
@@ -89,15 +116,16 @@ public class CarListActivity extends AppCompatActivity {
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final CarListActivity mParentActivity;
-        private final List<DummyContent.DummyItem> mValues;
+        private final CarDetails mValues;
         private final boolean mTwoPane;
+
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                CarDetail item = (CarDetail) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(CarDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putString(CarDetailFragment.ARG_ITEM_ID, item.getCarUri());
                     CarDetailFragment fragment = new CarDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -106,7 +134,7 @@ public class CarListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, CarDetailActivity.class);
-                    intent.putExtra(CarDetailFragment.ARG_ITEM_ID, item.id);
+                    intent.putExtra(CarDetailFragment.ARG_ITEM_ID, item.getCarUri());
 
                     context.startActivity(intent);
                 }
@@ -114,7 +142,7 @@ public class CarListActivity extends AppCompatActivity {
         };
 
         SimpleItemRecyclerViewAdapter(CarListActivity parent,
-                                      List<DummyContent.DummyItem> items,
+                                      CarDetails items,
                                       boolean twoPane) {
             mValues = items;
             mParentActivity = parent;
@@ -130,8 +158,9 @@ public class CarListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.wothField.setText(mValues.get(position).id);
-            holder.carName.setText(mValues.get(position).content);
+            String[] carName = mValues.get(position).getCarUri().split("/");
+            holder.wothField.setText("Rating:" + mValues.get(position).getWorth().toString());
+            holder.carName.setText(carName[4] + " " + carName[5]);
             holder.dateAdded.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime()));
 
             holder.itemView.setTag(mValues.get(position));

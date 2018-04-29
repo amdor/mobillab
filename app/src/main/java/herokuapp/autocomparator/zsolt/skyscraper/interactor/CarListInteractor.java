@@ -1,5 +1,7 @@
 package herokuapp.autocomparator.zsolt.skyscraper.interactor;
 
+import android.os.StrictMode;
+
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -19,6 +21,11 @@ public class CarListInteractor {
             = MediaType.parse("application/json; charset=utf-8");
 
     OkHttpClient client = new OkHttpClient();
+
+    public CarListInteractor() {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+    }
 
     public CarDetails postCars(CarQueryObject queryObject){
         try {

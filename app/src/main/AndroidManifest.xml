@@ -31,5 +31,6 @@
                 android:value="herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.CarListActivity" />
         </activity>
     </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>

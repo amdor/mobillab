@@ -1,6 +1,7 @@
 package herokuapp.autocomparator.zsolt.skyscraper;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import herokuapp.autocomparator.zsolt.skyscraper.ui.UIModule;
 
