@@ -2,16 +2,15 @@ package herokuapp.autocomparator.zsolt.skyscraper.ui.carlist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import herokuapp.autocomparator.zsolt.skyscraper.R;
+import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
 /**
  * An activity representing a single Car detail screen. This
@@ -25,8 +24,6 @@ public class CarDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
-        setSupportActionBar(toolbar);
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -47,14 +44,18 @@ public class CarDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(CarDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(CarDetailFragment.ARG_ITEM_ID));
+            arguments.putInt(CarDetailFragment.ARG_ITEM_INDEX,
+                    getIntent().getIntExtra(CarDetailFragment.ARG_ITEM_INDEX, 0));
             CarDetailFragment fragment = new CarDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.car_detail_container, fragment)
                     .commit();
         }
+        String[] carName = DummyContent.ITEMS.get(getIntent().getIntExtra(CarDetailFragment.ARG_ITEM_INDEX, 0))
+                .getCarUri()
+                .split("/");
+        ((TextView) findViewById(R.id.detailCarname)).setText(carName[4] + " " + carName[5]);
     }
 
     @Override

@@ -1,8 +1,6 @@
 package herokuapp.autocomparator.zsolt.skyscraper.ui.carlist;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,15 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import javax.inject.Inject;
 
 import herokuapp.autocomparator.zsolt.skyscraper.R;
 import herokuapp.autocomparator.zsolt.skyscraper.SkyscraperApplication;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetail;
-import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
 /**
@@ -32,7 +26,7 @@ public class CarDetailFragment extends Fragment implements CarListDetailsScreen 
      * The fragment argument representing the item ID that this fragment
      * represents.
      */
-    public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_ITEM_INDEX = "item_index";
 
     /**
      * The dummy content this fragment is presenting.
@@ -62,18 +56,18 @@ public class CarDetailFragment extends Fragment implements CarListDetailsScreen 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
+        if (getArguments().containsKey(ARG_ITEM_INDEX)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            mItem = DummyContent.ITEMS.get(getArguments().getInt(ARG_ITEM_INDEX));
 
-            Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                String[] carName = mItem.getCarUri().split("/");
-                appBarLayout.setTitle(carName[4] + carName[5]);
-            }
+//            Activity activity = this.getActivity();
+//            Toolbar toolbar = (Toolbar) activity.findViewById(R.id.detail_toolbar);
+//            if (toolbar != null) {
+//                String[] carName = mItem.getCarUri().split("/");
+//                toolbar.setTitle(carName[4] + " " + carName[5]);
+//            }
         }
     }
 
@@ -84,7 +78,11 @@ public class CarDetailFragment extends Fragment implements CarListDetailsScreen 
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.car_detail)).setText(mItem.getPrice());
+            ((TextView) rootView.findViewById(R.id.price)).setText(mItem.getPrice());
+            ((TextView) rootView.findViewById(R.id.power)).setText(mItem.getPower());
+            ((TextView) rootView.findViewById(R.id.mileage)).setText(mItem.getSpeedometer());
+            ((TextView) rootView.findViewById(R.id.prodDate)).setText(mItem.getProdDate());
+            ((TextView) rootView.findViewById(R.id.worth)).setText(mItem.getWorth().toString());
         }
 
         return rootView;

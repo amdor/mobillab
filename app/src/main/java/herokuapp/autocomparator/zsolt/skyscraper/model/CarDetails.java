@@ -12,6 +12,8 @@
 
 package herokuapp.autocomparator.zsolt.skyscraper.model;
 
+import android.arch.persistence.room.ColumnInfo;
+
 import java.util.ArrayList;
 
 import io.swagger.annotations.ApiModel;

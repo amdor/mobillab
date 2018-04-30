@@ -45,7 +45,7 @@ public class CarDetail {
 
   @SerializedName("worth")
   @ColumnInfo(name = "worth")
-  private Integer worth = null;
+  private Float worth = null;
 
   /**
    **/
@@ -100,10 +100,10 @@ public class CarDetail {
   /**
    **/
   @ApiModelProperty(required = true, value = "")
-  public Integer getWorth() {
+  public Float getWorth() {
     return worth;
   }
-  public void setWorth(Integer worth) {
+  public void setWorth(Float worth) {
     this.worth = worth;
   }
 

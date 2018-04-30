@@ -1,5 +1,6 @@
 package herokuapp.autocomparator.zsolt.skyscraper.model;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
@@ -12,6 +13,6 @@ public class CarDetailsEntity {
     @NonNull
     public String uname;
 
-    @Embedded
-    public CarDetails carDetails;
+    @ColumnInfo(name = "car_details")
+    public String carDetails;
 }

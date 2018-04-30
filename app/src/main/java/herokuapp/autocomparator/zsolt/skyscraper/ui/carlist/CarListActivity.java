@@ -3,18 +3,23 @@ package herokuapp.autocomparator.zsolt.skyscraper.ui.carlist;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import herokuapp.autocomparator.zsolt.skyscraper.R;
 
@@ -22,6 +27,7 @@ import herokuapp.autocomparator.zsolt.skyscraper.data.AppDatabase;
 import herokuapp.autocomparator.zsolt.skyscraper.interactor.CarListInteractor;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetail;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetails;
+import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetailsEntity;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
 
@@ -31,8 +37,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-
-import javax.inject.Inject;
 
 /**
  * An activity representing a list of Cars. This activity
@@ -44,12 +48,10 @@ import javax.inject.Inject;
  */
 public class CarListActivity extends AppCompatActivity {
 
-
-    @Inject
     CarListInteractor carListInteractor;
 
     // TODO: connect with UI, replace dummy
-    private AppDatabase db;
+    private static AppDatabase db;
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -59,19 +61,19 @@ public class CarListActivity extends AppCompatActivity {
 
     private EditText newCarUrl;
     private Button addUrl;
+    private View recyclerView;
+
+    private final Gson gson = new Gson();
+    public static String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_list);
 
-        this.db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-car-data").build();
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-car-data").allowMainThreadQueries().build();
         this.carListInteractor = new CarListInteractor();
-
-        Bundle bundle = getIntent().getExtras();
-        String userName = bundle.getString("userName");
-        //TODO: load data from db
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -85,11 +87,12 @@ public class CarListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-        View recyclerView = findViewById(R.id.car_list);
+        recyclerView = findViewById(R.id.car_list);
         assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView, null);
 
         newCarUrl = (EditText) findViewById(R.id.carUrl);
+        //TODO: remove
+        newCarUrl.setText("https://www.hasznaltauto.hu/szemelyauto/audi/a7/audi_a7_3_0_v6_tdi_dpf_quattro_tiptronic_ic_full-12835346");
         addUrl = (Button) findViewById(R.id.addButton);
         addUrl.setOnClickListener(
                 new View.OnClickListener() {
@@ -99,17 +102,69 @@ public class CarListActivity extends AppCompatActivity {
                         urls.add(newCarUrl.getText().toString());
                         queryObject.setCarUrls(urls);
                         CarDetails carDetails = carListInteractor.postCars(queryObject);
+
                         //the must be only one since we sent one link
                         DummyContent.addItem(carDetails.get(0));
+
+                        Gson gson = new Gson();
+                        String carDetailsJson = gson.toJson(DummyContent.ITEMS, CarDetails.class);
+                        if (DummyContent.ITEMS.size() > 1) {
+                            db.carDataDao().updateCarDetails(carDetailsJson, userName);
+                        } else {
+                            CarDetailsEntity entity = new CarDetailsEntity();
+                            entity.uname = userName;
+                            entity.carDetails = carDetailsJson;
+                            db.carDataDao().insertAll(entity);
+                        }
+
                         View recyclerView = findViewById(R.id.car_list);
                         assert recyclerView != null;
-                        setupRecyclerView((RecyclerView) recyclerView, carDetails);
+                        setupRecyclerView((RecyclerView) recyclerView);
                     }
                 });
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView, CarDetails carDetails) {
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            userName = bundle.getString("userName");
+        }
+
+        CarDetailsEntity carDetailsEntity = db.carDataDao().getCarDataByUser(userName);
+        if (carDetailsEntity != null) {
+            Log.i("CarListActivity", "Car details is not null");
+            DummyContent.ITEMS = gson.fromJson(carDetailsEntity.carDetails, CarDetails.class);
+        } else {
+            DummyContent.ITEMS = new CarDetails();
+        }
+        setupRecyclerView((RecyclerView) recyclerView);
+    }
+
+    private void setupRecyclerView(@NonNull final RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane));
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                SimpleItemRecyclerViewAdapter adapter = (SimpleItemRecyclerViewAdapter)recyclerView.getAdapter();
+                adapter.removeAt(viewHolder.getAdapterPosition());
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                // view the background view
+            }
+        };
+
+// attaching the touch helper to recycler view
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
     }
 
     public static class SimpleItemRecyclerViewAdapter
@@ -122,10 +177,11 @@ public class CarListActivity extends AppCompatActivity {
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CarDetail item = (CarDetail) view.getTag();
+                Integer itemIndex = (Integer) view.getTag();
+                CarDetail item = DummyContent.ITEMS.get(itemIndex);
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(CarDetailFragment.ARG_ITEM_ID, item.getCarUri());
+                    arguments.putInt(CarDetailFragment.ARG_ITEM_INDEX, itemIndex);
                     CarDetailFragment fragment = new CarDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -134,7 +190,7 @@ public class CarListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, CarDetailActivity.class);
-                    intent.putExtra(CarDetailFragment.ARG_ITEM_ID, item.getCarUri());
+                    intent.putExtra(CarDetailFragment.ARG_ITEM_INDEX, itemIndex);
 
                     context.startActivity(intent);
                 }
@@ -161,9 +217,9 @@ public class CarListActivity extends AppCompatActivity {
             String[] carName = mValues.get(position).getCarUri().split("/");
             holder.wothField.setText("Rating:" + mValues.get(position).getWorth().toString());
             holder.carName.setText(carName[4] + " " + carName[5]);
-            holder.dateAdded.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().getTime()));
+            holder.dateAdded.setText(mValues.get(position).getProdDate());
 
-            holder.itemView.setTag(mValues.get(position));
+            holder.itemView.setTag(position);
             holder.itemView.setOnClickListener(mOnClickListener);
         }
 
@@ -171,6 +227,7 @@ public class CarListActivity extends AppCompatActivity {
         public int getItemCount() {
             return mValues.size();
         }
+
 
         class ViewHolder extends RecyclerView.ViewHolder {
             final TextView wothField;
@@ -183,6 +240,15 @@ public class CarListActivity extends AppCompatActivity {
                 dateAdded = (TextView) view.findViewById(R.id.dateAdded);
                 carName = (TextView) view.findViewById(R.id.carName);
             }
+        }
+
+        public void removeAt(int position) {
+            Gson gson = new Gson();
+
+            DummyContent.ITEMS.remove(position);
+            String carDetailsJson = gson.toJson(DummyContent.ITEMS, CarDetails.class);
+            db.carDataDao().updateCarDetails(userName, carDetailsJson);
+            notifyItemRemoved(position);
         }
     }
 

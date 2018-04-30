@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     public void login(String userName) {
         Intent intent = new Intent(this, CarListActivity.class);
         intent.putExtra("userName", userName);
+        Log.i("MainActivity", "Login called with: " + userName);
         startActivity(intent);
     }
 }

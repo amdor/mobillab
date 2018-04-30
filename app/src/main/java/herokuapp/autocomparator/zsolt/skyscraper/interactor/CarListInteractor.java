@@ -16,7 +16,8 @@ import okhttp3.Response;
 
 
 public class CarListInteractor {
-    private static final String URL = "https://skyscraper-bes.herokuapp.com";
+    private static final String URL = "https://skyscraper-bes.herokuapp.com/";
+//    private static final String URL = "http://10.0.2.2:5000";
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
 

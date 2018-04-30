@@ -14,6 +14,12 @@ public interface CarDataDao {
     @Query("SELECT * FROM car_data")
     public List<CarDetailsEntity> getAllCarData();
 
+    @Query("SELECT * FROM car_data WHERE uname=:uname")
+    public CarDetailsEntity getCarDataByUser(String uname);
+
+    @Query("UPDATE car_data SET car_details=:carDetails WHERE uname=:uname")
+    public void updateCarDetails(String carDetails, String uname);
+
     @Insert
     void insertAll(CarDetailsEntity... carDetails);
 
