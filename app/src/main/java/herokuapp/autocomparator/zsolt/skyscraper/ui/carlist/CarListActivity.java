@@ -4,6 +4,7 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,13 +17,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import herokuapp.autocomparator.zsolt.skyscraper.R;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import herokuapp.autocomparator.zsolt.skyscraper.R;
 import herokuapp.autocomparator.zsolt.skyscraper.data.AppDatabase;
 import herokuapp.autocomparator.zsolt.skyscraper.interactor.CarListInteractor;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetail;
@@ -30,13 +33,6 @@ import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetails;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarDetailsEntity;
 import herokuapp.autocomparator.zsolt.skyscraper.model.CarQueryObject;
 import herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.dummy.DummyContent;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * An activity representing a list of Cars. This activity
@@ -108,14 +104,10 @@ public class CarListActivity extends AppCompatActivity {
 
                         Gson gson = new Gson();
                         String carDetailsJson = gson.toJson(DummyContent.ITEMS, CarDetails.class);
-                        if (DummyContent.ITEMS.size() > 1) {
-                            db.carDataDao().updateCarDetails(carDetailsJson, userName);
-                        } else {
-                            CarDetailsEntity entity = new CarDetailsEntity();
-                            entity.uname = userName;
-                            entity.carDetails = carDetailsJson;
-                            db.carDataDao().insertAll(entity);
-                        }
+                        CarDetailsEntity entity = new CarDetailsEntity();
+                        entity.uname = userName;
+                        entity.carDetails = carDetailsJson;
+                        db.carDataDao().insertAll(entity);
 
                         View recyclerView = findViewById(R.id.car_list);
                         assert recyclerView != null;
@@ -153,13 +145,35 @@ public class CarListActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                SimpleItemRecyclerViewAdapter adapter = (SimpleItemRecyclerViewAdapter)recyclerView.getAdapter();
+                SimpleItemRecyclerViewAdapter adapter = (SimpleItemRecyclerViewAdapter) recyclerView.getAdapter();
                 adapter.removeAt(viewHolder.getAdapterPosition());
             }
 
             @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                // view the background view
+            public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder, float dX, float dY,
+                                    int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    // Get RecyclerView item from the ViewHolder
+                    View itemView = viewHolder.itemView;
+
+                    Paint p = new Paint();
+                    if (dX > 0) {
+                        /* Set your color for positive displacement */
+
+                        // Draw Rect with varying right side, equal to displacement dX
+                        c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
+                                (float) itemView.getBottom(), p);
+                    } else {
+                        /* Set your color for negative displacement */
+
+                        // Draw Rect with varying left side, equal to the item's right side plus negative displacement dX
+                        c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
+                                (float) itemView.getRight(), (float) itemView.getBottom(), p);
+                    }
+
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
             }
         };
 
@@ -243,11 +257,13 @@ public class CarListActivity extends AppCompatActivity {
         }
 
         public void removeAt(int position) {
-            Gson gson = new Gson();
-
             DummyContent.ITEMS.remove(position);
+            Gson gson = new Gson();
             String carDetailsJson = gson.toJson(DummyContent.ITEMS, CarDetails.class);
-            db.carDataDao().updateCarDetails(userName, carDetailsJson);
+            CarDetailsEntity entity = new CarDetailsEntity();
+            entity.uname = userName;
+            entity.carDetails = carDetailsJson;
+            db.carDataDao().insertAll(entity);
             notifyItemRemoved(position);
         }
     }
