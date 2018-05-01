@@ -4,6 +4,8 @@ import android.app.Application;
 import android.os.StrictMode;
 
 import herokuapp.autocomparator.zsolt.skyscraper.ui.UIModule;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 public class SkyscraperApplication extends Application {
 
@@ -12,6 +14,7 @@ public class SkyscraperApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         injector =
                 DaggerSkyscraperApplicationComponent.builder().

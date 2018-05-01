@@ -30,6 +30,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="herokuapp.autocomparator.zsolt.skyscraper.ui.carlist.CarListActivity" />
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a600596a20f54925e711af1a9ab9925a0c55eba5" />
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 
